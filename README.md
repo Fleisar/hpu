@@ -1,1 +1,2 @@
-# hpu
+# HPU
+An ecosystem for hanging out, shopping, watch or listening media and more more other...
