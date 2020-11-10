@@ -24,10 +24,9 @@ function test_1(){
         "state" => ($sql !== false)
     ]);
     $table_results = [];
-    $db = $_CONFIG["sql"]["database"];
     $need_repair = false;
     foreach ($_CONFIG["db"] as $name => $table){
-        $result = $sql->sql->query("SELECT * FROM `${db}`.`${table}` LIMIT 1");
+        $result = $sql->sql->query("SELECT * FROM `".$_CONFIG["sql"]["database"]."`.`".$table."` LIMIT 1");
         if ($result == false) $need_repair = true;
         array_push($table_results, ["name"=>$name,"state"=>($result!==false)]);
     }
