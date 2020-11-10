@@ -14,7 +14,8 @@ $_CONFIG = [
         "database" => "general"
     ],
     "db" => [
-        "users" => "hpu.users"
+        "users" => "hpu.users",
+        "messages" => "hpu.messages"
     ],
     "db_constructor" => [
         "users" => [
@@ -23,6 +24,14 @@ $_CONFIG = [
             "`password` TINYTEXT NOT NULL",
             "`session` TINYTEXT",
             "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
+            "PRIMARY KEY (`id`)"
+        ],
+        "messages" => [
+            "`id` INT NOT NULL AUTO_INCREMENT",
+            "`from` TINYTEXT NOT NULL",
+            "`to` TINYTEXT NOT NULL",
+            "`content` TINYTEXT NOT NULL",
+            "`sent` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP",
             "PRIMARY KEY (`id`)"
         ]
     ]
