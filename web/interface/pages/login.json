@@ -1,0 +1,7 @@
+{
+  "name": "login",
+  "version": 1.0,
+  "scripts": ["res/md5.js","res/mlf.js"],
+  "styles": ["res/login.css"],
+  "classes": ["flex"]
+}
