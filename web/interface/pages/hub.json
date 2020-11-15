@@ -1,0 +1,6 @@
+{
+  "name": "hub",
+  "version": 1.0,
+  "scripts": ["res/md5.js","res/hub.js"],
+  "classes": ["flex"]
+}
