@@ -24,10 +24,9 @@ sql.connect((error) => {
 })
 io.on('connection', (socket) => {
     socket.emit('connectionCheck', (new Date()).getTime())
+    // only for checking
     socket.on('AuthRequest', (d) => {
-        sql.query('SELECT `password` FROM `?`.`?` WHERE `username`=\'?\'', [
-            CONFIG.sql.database,
-            CONFIG.db.users,
+        sql.query('SELECT `password` FROM `'+CONFIG.sql.database+'`.`'+CONFIG.db.users+'` WHERE `username`=?', [
             d.username
         ],(error,data)=>{
             if(error){
@@ -38,6 +37,66 @@ io.on('connection', (socket) => {
                 socket.emit('AuthResponse',{state:false,description:'user not found.'})
             socket.emit('AuthResponse',{state:(MD5(d.password) === data[0].password)})
         })
+    })
+    socket.on('authorize',(d)=>{
+        switch (d.type){
+            case 'traditional':
+                if(d.username === undefined || d.password === undefined)
+                    socket.emit('authorize',{
+                        type: 'response',
+                        result: false,
+                        code: 0
+                    })
+                let time = (new Date()).getTime()
+                let session = MD5(d.username+":"+MD5(d.password)+":"+time)+"/"+time
+                sql.query('SELECT `password` FROM `'+CONFIG.sql.database+'`.`'+CONFIG.db.users+'` WHERE `username`=? LIMIT 1', [
+                    d.username
+                ], (error,data)=>{
+                    if(error){
+                        console.error(error)
+                        socket.emit('authorize',{type:'response',result:false,code:1})
+                    }
+                    if(data.length === 0 || MD5(d.password) !== data[0].password){
+                        socket.emit('authorize',{type:'response',result:false,code:2})
+                        return
+                    }
+                    sql.query('UPDATE `'+CONFIG.sql.database+'`.`'+CONFIG.db.users+'` SET `session`=? WHERE `username`=?', [
+                        session,
+                        d.username
+                    ], (error,data)=>{
+                        if(error){
+                            console.error(error)
+                            socket.emit('authorize',{type:'response',result:false,code:3})
+                        }
+                        socket.emit('authorize',{
+                            type: 'response',
+                            result: true,
+                            session: session
+                        })
+                    })
+                })
+                break;
+            case 'session':
+                if(d.username === undefined || d.session === undefined)
+                    socket.emit('authorize',{type:'response',result:false,code:4})
+                let sessionTime = d.session.split("/")[1]
+                sql.query('SELECT `password` FROM `'+CONFIG.sql.database+'`.`'+CONFIG.db.users+'` WHERE `username`=? AND `session`=? LIMIT 1', [
+                    d.username,
+                    d.session
+                ], (error,data)=>{
+                    if(error){
+                        console.error(error)
+                        socket.emit('authorize',{type:'response',result:false,code:5})
+                    }
+                    if(d.session !== MD5(d.username+":"+data[0].password+":"+sessionTime)+"/"+sessionTime)
+                        socket.emit('authorize',{type:'response',result:false,code:6})
+                    socket.emit('authorize',{
+                        type: 'response',
+                        result: true
+                    })
+                })
+                break;
+        }
     })
 })
 
