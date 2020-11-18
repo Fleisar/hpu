@@ -4,7 +4,7 @@ $_CONFIG = [
         "GET", "POST", "PUT", "DELETE", "OPTION"
     ],
     "module_blacklist" => [
-        "config", "main", "minfo", "sandbox", "stur", "SQLbb"
+        "config", "main", "minfo", "sandbox", "stur", "SQLbb", "AX"
     ],
     "sql" => [
         "ip" => "127.0.0.1",
