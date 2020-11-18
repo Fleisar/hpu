@@ -5,6 +5,7 @@
 
 require "stur.php";
 require "SQLbb.php";
+require "AX.php";
 require "config.php";
 
 session_start();
@@ -20,7 +21,7 @@ $sql = new SQLbb(
 $path = path();
 $module = explode("/", $path)[0];
 $get = array_slice(explode("/", $path."/"), 1);
-$json = json_decode(file_get_contents("php://input"));
+$json = (array) json_decode(file_get_contents("php://input"));
 
 $_mi->create([
     "name" => "main",
