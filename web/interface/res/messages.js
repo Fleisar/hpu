@@ -8,6 +8,12 @@ function msg_passive_mode(){
         d.sent = (new Date()).getTime()/1000
         hpu.messages.data.push(d)
         dialog_update(hpu.messages.currDialog)
+    }).off("onlineMng").on("onlineMng",(d)=>{
+        if(d.type === "online"){
+            $(".user-"+d.user).addClass("online")
+        }else{
+            $(".user-"+d.user).removeClass("online")
+        }
     })
 }
 function dialog_update(user){
@@ -31,6 +37,17 @@ function binds_msg(){
     })
     $(".dialog form").submit(function(){
         let content = $(".inputMessage").val()
+        $.ajax({
+            url: "../api/messages",
+            type: "PUT",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username_AX: localStorage.getItem("username"),
+                session_AX: localStorage.getItem("sessionKey"),
+                to: hpu.messages.currDialog,
+                text: content
+            })
+        })
         socket.emit("sendMessage",{
             username_AX: localStorage.getItem("username"),
             user_to: hpu.messages.currDialog,
@@ -75,7 +92,8 @@ function msg_init(callback){
                 ){
                     let newU = users.find((value)=>value===item.from) === undefined?item.from:item.to
                     users.push(newU)
-                    $(".people").append("<div class=\"userDMLink\" data-user=\""+newU+"\">"+newU+"</div>")
+                    $(".people").append("<div class=\"userDMLink user-"+newU+"\" data-user=\""+newU+"\">"+newU+"</div>")
+                    socket.emit("onlineMng",{type:"request-status",username:newU})
                 }
             })
             hpu.messages.users = users

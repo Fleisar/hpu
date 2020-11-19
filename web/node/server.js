@@ -28,6 +28,15 @@ sql.connect((error) => {
 io.on('connection', (socket) => {
     socket.emit('connectionCheck', (new Date()).getTime())
     socket.on('disconnect',()=>{
+        if(Object.values(AX_users).indexOf(socket.id) !== -1){
+            let user = Object.keys(AX_users)[Object.values(AX_users).indexOf(socket.id)]
+            console.log(user+" was disconnected.")
+            socket.broadcast.emit("onlineMng",{
+                type: "offline",
+                user: user
+            })
+        }
+
         users[socket.id] = undefined
     })
     users[socket.id] = socket
@@ -76,6 +85,10 @@ io.on('connection', (socket) => {
                             socket.emit('authorize',{type:'response',result:false,code:3})
                         }
                         AX_users[d.username] = socket.id
+                        socket.broadcast.emit("onlineMng",{
+                            type: "online",
+                            user: d.username
+                        })
                         console.log(d.username+" was authorized.")
                         socket.emit('authorize',{
                             type: 'response',
@@ -101,6 +114,10 @@ io.on('connection', (socket) => {
                         socket.emit('authorize',{type:'response',result:false,code:6})
                     AX_users[d.username] = socket.id
                     console.log(d.username+" was authorized.")
+                    socket.broadcast.emit("onlineMng",{
+                        type: "online",
+                        user: d.username
+                    })
                     socket.emit('authorize',{
                         type: 'response',
                         result: true
@@ -135,6 +152,21 @@ io.on('connection', (socket) => {
         socket.emit('sendMessage',{
             type: 'response',
             result: true
+        })
+    }).on("onlineMng",(d)=>{
+        if(d.type !== "request-status")
+            socket.emit("onlineMng",{
+                type: 'response',
+                result: false
+            })
+        if(d.username === undefined)
+            socket.emit("onlineMng",{
+                type: 'response',
+                result: false
+            })
+        socket.emit("onlineMng",{
+            type: AX_users[d.username] !== undefined?"online":"offline",
+            user: d.username
         })
     })
 })

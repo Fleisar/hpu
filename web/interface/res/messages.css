@@ -18,10 +18,24 @@
   border-top: 1px solid #939393;
   border-bottom: 1px solid #939393;
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 5px 10px 5px 18px;
+  position: relative;
 }
 .people div.userDMLink.selected {
   background: linear-gradient(180deg, #b2b2b2, #d6d5d5);
+}
+.people div.userDMLink:before {
+  content: "";
+  background-color: #a00f0f;
+  width: 10px;
+  height: 10px;
+  display: block;
+  position: absolute;
+  border-radius: 5px;
+  left: 5px;
+}
+.people div.userDMLink.online:before {
+  background-color: #1ea00f;
 }
 
 .dialog {
