@@ -1,4 +1,7 @@
 let JQInit = false
+let hpu = {
+    messages: []
+}
 const socket = io('http://127.0.0.1:813')
 $(()=>{
     JQInit = true
@@ -7,6 +10,7 @@ $(()=>{
 })
 socket.on('connect', ()=>{
     console.log("[Socket.IO] Connected.")
+    check_authorization()
 }).on('error', (error)=>{
     console.error("[Socket.IO] Connection thrown an error.", error)
 }).on('reconnect', ()=>{
@@ -19,7 +23,7 @@ socket.on('connect', ()=>{
 const pgm = {
     config: [],
     content: undefined,
-    list: ['login','hub'],
+    list: ['login','hub','messages'],
     curreth: null,
     get(){
         return this.curreth
@@ -75,4 +79,28 @@ function notification(text){
     setTimeout(()=>{
         $(".notif-"+time).remove()
     },3e3)
+}
+function dateFormer(unix){
+    let t = new Date(unix)
+    return (t.getDate()>=10?t.getDate():"0"+t.getDate())+"."+
+        (t.getMonth()>=10?t.getMonth():"0"+t.getMonth())+"."+
+        t.getFullYear()+" "+
+        (t.getHours()>=10?t.getHours():"0"+t.getHours())+":"+
+        (t.getMinutes()>=10?t.getMinutes():"0"+t.getMinutes())+":"+
+        (t.getSeconds()>=10?t.getSeconds():"0"+t.getSeconds())
+}
+function check_authorization(){
+    if(localStorage.getItem("sessionKey") === null)
+        return false
+    socket.emit("authorize",{
+        type: 'session',
+        session: localStorage.getItem("sessionKey"),
+        username: localStorage.getItem("username")
+    }).off('authorize').on("authorize",(d)=>{
+        if(d.type !== 'response')
+            return false
+        if(!d.result)
+            notification("Unable to authorize via session")
+        return d.result
+    })
 }

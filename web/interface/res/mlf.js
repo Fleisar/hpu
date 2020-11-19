@@ -28,18 +28,3 @@ function binds_mlf(){
         return false
     })
 }
-function check_authorization(){
-    if(localStorage.getItem("sessionKey") === null)
-        return false
-    socket.emit("authorize",{
-        type: 'session',
-        session: localStorage.getItem("sessionKey"),
-        username: localStorage.getItem("username")
-    }).off('authorize').on("authorize",(d)=>{
-        if(d.type !== 'response')
-            return false
-        if(!d.result)
-            notification("Unable to authorize via session")
-        return d.result
-    })
-}
