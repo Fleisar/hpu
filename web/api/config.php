@@ -13,6 +13,7 @@ $_CONFIG = [
         "password" => "",
         "database" => "general"
     ],
+    "timeOffset" => 6,
     "db" => [
         "users" => "hpu.users",
         "messages" => "hpu.messages"
