@@ -15,20 +15,20 @@ $_mi->create([
         "AX failed."
     ]
 ]);
-if(!isset($json["username_AX"]) || !isset($json["session_AX"]))
-    $api->send(false,6,"messages");
-if(!userAX($json["username_AX"], $json["session_AX"]))
-    $api->send(false,3,"messages");
 switch($_SERVER["REQUEST_METHOD"]){
     case "GET": //{to,start_from,end_on,limit
-        if(!isset($json["to"]) || !isset($json["start_from"]))
+        if(!isset($head["username_AX"]) || !isset($head["session_AX"]))
+            $api->send(false,6,"messages");
+        if(!userAX($head["username_AX"], $head["session_AX"]))
+            $api->send(false,3,"messages");
+        if(!isset($head["to"]) || !isset($head["start_from"]))
             $api->send(false,2,"messages");
-        $start = (int) $json["start_from"];
-        $from = $sql->sql->real_escape_string($json["username_AX"]);
-        $to = $sql->sql->real_escape_string($json["to"]);
+        $start = (int) $head["start_from"];
+        $from = $sql->sql->real_escape_string($head["username_AX"]);
+        $to = $sql->sql->real_escape_string($head["to"]);
         $table = $sql->sql->real_escape_string($_CONFIG["db"]["messages"]);
-        if(isset($json["end_on"])){
-            $end = (int) $json["end_on"];
+        if(isset($head["end_on"])){
+            $end = (int) $head["end_on"];
             $selected = $sql->sql->query("
                 SELECT * 
                 FROM `${table}` 
@@ -48,10 +48,17 @@ switch($_SERVER["REQUEST_METHOD"]){
             ");
         }
         $messages = [];
-        while($message = $selected->fetch_assoc()) $messages[sizeof($messages)] = $message;
+        while($message = $selected->fetch_assoc()){
+            $message["sent"] = toUnix($message["sent"]);
+            $messages[sizeof($messages)] = $message;
+        }
         $api->send(true,0,"messages",["messages"=>$messages]);
         break;
     case "PUT": //{to,text}
+        if(!isset($json["username_AX"]) || !isset($json["session_AX"]))
+            $api->send(false,6,"messages");
+        if(!userAX($json["username_AX"], $json["session_AX"]))
+            $api->send(false,3,"messages");
         $find = $sql->select($_CONFIG["db"]["users"],["username"=>$json["to"]]);
         if(!isset($json["to"]) || !isset($json["text"]))
             $api->send(false,2,"messages");

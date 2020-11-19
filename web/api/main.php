@@ -22,6 +22,7 @@ $path = path();
 $module = explode("/", $path)[0];
 $get = array_slice(explode("/", $path."/"), 1);
 $json = (array) json_decode(file_get_contents("php://input"));
+$head = getallheaders();
 
 $_mi->create([
     "name" => "main",
@@ -50,4 +51,11 @@ function path(){
         $step++;
     }
     return join("/", array_slice($pic, $step));
+}
+function toUnix(string $date){
+    global $_CONFIG;
+    $times = explode(" ", $date);
+    $in_year = explode("-",  $times[0]);
+    $in_day = explode(":", $times[1]);
+    return mktime($in_day[0]-$_CONFIG["timeOffset"],$in_day[1],$in_day[2],$in_year[1],$in_year[2],$in_year[0]);
 }
