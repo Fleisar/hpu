@@ -9,6 +9,9 @@ const io = require('socket.io')(http, {
 const mysql = require('mysql')
 const CONFIG = require('./config')
 
+let users = {}
+let AX_users = {}
+
 let sql = mysql.createConnection({
     host: CONFIG.sql.ip,
     user: CONFIG.sql.user,
@@ -24,6 +27,10 @@ sql.connect((error) => {
 })
 io.on('connection', (socket) => {
     socket.emit('connectionCheck', (new Date()).getTime())
+    socket.on('disconnect',()=>{
+        users[socket.id] = undefined
+    })
+    users[socket.id] = socket
     // only for checking
     socket.on('AuthRequest', (d) => {
         sql.query('SELECT `password` FROM `'+CONFIG.sql.database+'`.`'+CONFIG.db.users+'` WHERE `username`=?', [
@@ -68,6 +75,8 @@ io.on('connection', (socket) => {
                             console.error(error)
                             socket.emit('authorize',{type:'response',result:false,code:3})
                         }
+                        AX_users[d.username] = socket.id
+                        console.log(d.username+" was authorized.")
                         socket.emit('authorize',{
                             type: 'response',
                             result: true,
@@ -90,6 +99,8 @@ io.on('connection', (socket) => {
                     }
                     if(d.session !== MD5(d.username+":"+data[0].password+":"+sessionTime)+"/"+sessionTime)
                         socket.emit('authorize',{type:'response',result:false,code:6})
+                    AX_users[d.username] = socket.id
+                    console.log(d.username+" was authorized.")
                     socket.emit('authorize',{
                         type: 'response',
                         result: true
@@ -97,6 +108,34 @@ io.on('connection', (socket) => {
                 })
                 break;
         }
+    }).on('sendMessage',(d)=>{
+        if(AX_users[d.username_AX] !== socket.id || d.username_AX === undefined)
+            socket.emit('sendMessage',{
+                type: 'response',
+                result: false,
+                reason: 'Refused due to authorization.'
+            })
+        if(AX_users[d.user_to] === undefined)
+            socket.emit('sendMessage',{
+                type: 'response',
+                result: false,
+                reason: 'This user is currently offline.'
+            })
+        if(d.content.length === 0 || d.content.length > 300)
+            socket.emit('sendMessage',{
+                type: 'response',
+                result: false,
+                reason: 'Message too short or too long.'
+            })
+        users[AX_users[d.user_to]].emit('receiveMessage',{
+            from: d.username_AX,
+            to: d.user_to,
+            content: d.content
+        })
+        socket.emit('sendMessage',{
+            type: 'response',
+            result: true
+        })
     })
 })
 
