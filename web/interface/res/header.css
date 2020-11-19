@@ -1,0 +1,14 @@
+._body {
+  padding-top: 33px;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(0deg, #d2d2d2, #ffffff00);
+  border-bottom: 1px solid #939393;
+}
+
+/*# sourceMappingURL=header.css.map */

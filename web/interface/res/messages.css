@@ -1,0 +1,75 @@
+._body {
+  font-size: 0;
+}
+
+.people {
+  font-size: initial;
+  border-right: 1px solid #939393;
+  width: 200px;
+  height: 100%;
+  background: #f5f5f5;
+  box-sizing: border-box;
+  padding-top: 5px;
+  display: inline-block;
+  vertical-align: top;
+}
+.people div.userDMLink {
+  background: linear-gradient(0deg, #d2d2d2, #ffffff00);
+  border-top: 1px solid #939393;
+  border-bottom: 1px solid #939393;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+.people div.userDMLink.selected {
+  background: linear-gradient(180deg, #b2b2b2, #d6d5d5);
+}
+
+.dialog {
+  font-size: initial;
+  display: inline-block;
+  width: calc(100% - 200px);
+  height: 100%;
+}
+.dialog .messages {
+  height: calc(100% - 40px);
+  padding: 5px 10px;
+  box-sizing: border-box;
+}
+.dialog .messages .message {
+  border: 1px solid #939393;
+  border-radius: 3px;
+  display: table;
+  padding: 5px 10px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  background: #f5f5f5;
+  position: relative;
+}
+.dialog .messages .message:before {
+  content: var(--text);
+  position: absolute;
+  top: -15px;
+  font-size: small;
+  left: 5px;
+  width: max-content;
+}
+.dialog .messages .message.messageFrom {
+  margin-left: 0;
+}
+.dialog .messages .message.messageTo {
+  margin-right: 0;
+}
+.dialog .messages .message.messageTo:before {
+  left: auto;
+  right: 5px;
+}
+.dialog form {
+  height: 40px;
+  position: relative;
+}
+.dialog form input {
+  width: calc(100% - 85px);
+}
+
+/*# sourceMappingURL=messages.css.map */

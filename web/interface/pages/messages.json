@@ -1,0 +1,6 @@
+{
+  "name": "login",
+  "version": 1.0,
+  "scripts": ["res/messages.js"],
+  "styles": ["res/messages.css","res/header.css"]
+}
